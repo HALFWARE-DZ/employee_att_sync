@@ -4,22 +4,35 @@ app_publisher = "HALFWARE"
 app_description = "Eomplyees Attence Sync between HR and ATT DEVICE"
 app_email = "contact@half-ware.com"
 app_license = "mit"
+app_logo_url = "/assets/employee_att_sync/fingerprint.png"
 
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["hrms"]
+
+fixtures = [
+    {"dt": "Workspace", "filters": [["name", "in", ("Employee Att Sync")]]},
+    {"dt": "DocType", "filters": [["name", "in", (
+        "Attendance Sync Setup",
+        "Att Devices",
+        "Att Shifts",
+        "Att Shifts Devices"
+    )]]}
+]
+
+
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
+#add_to_apps_screen = [
 # 	{
 # 		"name": "employee_att_sync",
-# 		"logo": "/assets/employee_att_sync/logo.png",
+# 		"logo": "/assets/employee_att_sync/fingerprint.png",
 # 		"title": "Employee Att Sync",
 # 		"route": "/employee_att_sync",
 # 		"has_permission": "employee_att_sync.api.permission.has_app_permission"
 # 	}
-# ]
+#]
 
 # Includes in <head>
 # ------------------
@@ -51,7 +64,7 @@ app_license = "mit"
 # Svg Icons
 # ------------------
 # include app icons in desk
-# app_include_icons = "employee_att_sync/public/icons.svg"
+# app_include_icons = "/files/fingerprint.svg"
 
 # Home Pages
 # ----------
@@ -143,10 +156,10 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"employee_att_sync.tasks.all"
-# 	],
+scheduler_events = {
+ 	"all": [
+ 		"employee_att_sync.tasks.execute_sync"
+ 	]
 # 	"daily": [
 # 		"employee_att_sync.tasks.daily"
 # 	],
@@ -159,7 +172,7 @@ app_license = "mit"
 # 	"monthly": [
 # 		"employee_att_sync.tasks.monthly"
 # 	],
-# }
+}
 
 # Testing
 # -------

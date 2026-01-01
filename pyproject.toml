@@ -4,10 +4,11 @@ authors = [
     { name = "HALFWARE", email = "contact@half-ware.com"}
 ]
 description = "Eomplyees Attence Sync between HR and ATT DEVICE"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
+    "pyzk"
     # "frappe~=16.0.0" # Installed and managed by bench.
 ]
 
