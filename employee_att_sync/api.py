@@ -29,6 +29,39 @@ def test_device_connection(ip, port):
 
 @frappe.whitelist()
 def trigger_manual_sync():
+    setup = frappe.get_single("Attendance Sync Setup")
+    if not setup.enabled:
+        frappe.throw("La synchronisation est désactivée dans la configuration.")
+
+    devices = frappe.get_all("Att Devices", filters={"disabled": 0}, fields=["name", "device_id"])
+    
+    if not devices:
+        frappe.msgprint("Aucun appareil actif trouvé.")
+        return
+
+    total = len(devices)
+    
+    for i, d in enumerate(devices):
+        frappe.publish_progress(
+            float(i + 1) / total * 100, 
+            title="Synchronisation en cours...", 
+            description=f"Traitement de l'appareil : {d.device_id}"
+        )
+
+        device_doc = frappe.get_doc("Att Devices", d.name)
+        try:
+            sync_device_logs(device_doc)
+        except Exception:
+            frappe.log_error(title=f"Manual Sync Failed: {d.device_id}", message=frappe.get_traceback())
+
+    # Finalisation
+    update_shift_sync_timestamps()
+    
+    frappe.msgprint(f"Synchronisation terminée pour {total} appareils.")
+
+
+@frappe.whitelist()
+def trigger_manual_sync_old():
     """
     Invoked from 'Attendance Sync Setup' to start a sync immediately.
     This runs the same logic as the background scheduler.

@@ -1,6 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "field:shift_type",
  "creation": "2025-12-31 21:31:18.237306",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -15,7 +15,8 @@
    "in_list_view": 1,
    "label": "Shift Type",
    "options": "Shift Type",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "att_devices",
@@ -27,10 +28,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-31 22:08:33.586406",
+ "modified": "2026-01-01 12:51:36.746587",
  "modified_by": "Administrator",
  "module": "Employee Att Sync",
  "name": "Att Shifts",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

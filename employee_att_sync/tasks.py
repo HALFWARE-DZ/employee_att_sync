@@ -68,10 +68,23 @@ def process_attendance_log(log, device):
     """
     Validates and inserts an 'Employee Checkin' document into HRMS.
     """
+    employee_id = frappe.get_value(
+        "Employee",
+        {"attendance_device_id": str(log.user_id)},
+        "name"
+    )
+
+    if not employee_id:
+        frappe.log_error(
+            title=f"Checkin Failed: Employee Not Found",
+            message=f"Device: {device.device_id}\nUser ID pointeuse: {log.user_id}\nLog: {str(log)}"
+        )
+        return
+
     # Check for existing records to prevent duplicates in the database
     exists = frappe.db.exists("Employee Checkin", {
-        "employee_field_value": str(log.user_id),
-        "timestamp": log.timestamp,
+        "employee": employee_id,
+        "time": log.timestamp,
         "device_id": device.device_id
     })
     
@@ -80,8 +93,8 @@ def process_attendance_log(log, device):
             # Create a new HRMS Employee Checkin document
             doc = frappe.get_doc({
                 "doctype": "Employee Checkin",
-                "employee_field_value": str(log.user_id),
-                "timestamp": log.timestamp,
+                "employee": employee_id,
+                "time": log.timestamp,
                 "device_id": device.device_id,
                 "log_type": getattr(device, 'punch_direction', None),
                 "refresh_attendance": 1 # Tells HRMS to recalculate attendance for this employee
@@ -93,7 +106,7 @@ def process_attendance_log(log, device):
             # Filter out expected errors to avoid cluttering the Error Log
             if not (DUPLICATE_CHECKIN in error_msg or EMPLOYEE_NOT_FOUND in error_msg):
                 frappe.log_error(
-                    title=f"Checkin Insertion Failed: {log.user_id}",
+                    title=f"Checkin Insertion Failed: {employee_id}",
                     message=f"Device: {device.device_id}\nLog: {str(log)}\nError: {error_msg}"
                 )
 
@@ -115,10 +128,18 @@ def update_shift_sync_timestamps():
         
         if device_names:
             # Find the minimum (earliest) last sync time across all linked devices
-            min_ts = frappe.db.get_value("Att Devices", 
-                                        {"name": ["in", device_names]}, 
-                                        "min(last_sync)")
-            
+
+            #min_ts = frappe.db.get_value("Att Devices", 
+            #                            {"name": ["in", device_names]}, 
+            #                            {"min":"last_sync"})
+
+            result = frappe.db.sql("""
+                SELECT MIN(last_sync) as min_ts
+                FROM `tabAtt Devices`
+                WHERE name IN %s
+            """, (device_names,), as_dict=True)
+
+            min_ts = result[0].min_ts if result else None
             if min_ts:
                 # Update the standard HRMS Shift Type for automatic processing
                 frappe.db.set_value("Shift Type", mapping.shift_type, "last_sync_of_checkin", min_ts)
