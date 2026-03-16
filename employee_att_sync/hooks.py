@@ -156,10 +156,11 @@ fixtures = [
 # Scheduled Tasks
 # ---------------
 
-scheduler_events = {
- 	"all": [
- 		"employee_att_sync.tasks.execute_sync"
- 	]
+#scheduler_events = {
+# 	"all": [
+# 		"employee_att_sync.tasks.execute_sync"
+# 	]
+#}
 # 	"daily": [
 # 		"employee_att_sync.tasks.daily"
 # 	],
@@ -172,7 +173,7 @@ scheduler_events = {
 # 	"monthly": [
 # 		"employee_att_sync.tasks.monthly"
 # 	],
-}
+
 
 # Testing
 # -------
